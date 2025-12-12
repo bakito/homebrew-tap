@@ -3,7 +3,7 @@ cask "kubexporter" do
   name "kubexporter"
   desc "Export Kubernetes resources for backup and migration."
   homepage "https://github.com/bakito/kubexporter"
-  version "0.8.1"
+  version "0.8.2"
 
   livecheck do
     skip "Auto-generated on release."
@@ -14,7 +14,7 @@ cask "kubexporter" do
   on_macos do
     on_intel do
       url "https://github.com/bakito/kubexporter/releases/download/v#{version}/kubexporter_#{version}_darwin_amd64.tar.gz"
-      sha256 "3cde63919376862a145f88eef5d051c417554e3deb98214ac464e447ec70b8b0"
+      sha256 "8d0feb4abb7b81581f11cfc1d28a15c4a64cdf5528155bbccd8b46bd7ff3c97e"
     end
     on_arm do
       def caveats
@@ -30,7 +30,7 @@ cask "kubexporter" do
   on_linux do
     on_intel do
       url "https://github.com/bakito/kubexporter/releases/download/v#{version}/kubexporter_#{version}_linux_amd64.tar.gz"
-      sha256 "a506614eada8e70e860a10d9b796e1748027cdd7926d1db003178b81b9133e7c"
+      sha256 "ceeb9f5208957912fcd604d22d9e2a20e87d170b1b10009784eff2ede9e4492d"
     end
   end
 
