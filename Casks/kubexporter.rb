@@ -14,7 +14,7 @@ cask "kubexporter" do
   on_macos do
     on_intel do
       url "https://github.com/bakito/kubexporter/releases/download/v#{version}/kubexporter_#{version}_darwin_amd64.tar.gz"
-      sha256 "044c38022b06e76d82e0ca781253ff3a8c002483d7fcc347bab53ff392e0517f"
+      sha256 "6dd8f2b0398c2fed614a493593df3680f892c588a2d645ff35e51958fed1bd70"
     end
     on_arm do
       def caveats
@@ -30,7 +30,7 @@ cask "kubexporter" do
   on_linux do
     on_intel do
       url "https://github.com/bakito/kubexporter/releases/download/v#{version}/kubexporter_#{version}_linux_amd64.tar.gz"
-      sha256 "a87668be94ad673d0848671387def317e479fe6d7e6b820ce058e142a82e0599"
+      sha256 "34056e77ab36b114bfa4a53c65fdb9062d11a1b1ebbab72f6b9fd66104337e26"
     end
   end
 
