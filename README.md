@@ -38,6 +38,9 @@ brew uninstall --cask myapp
 
 The following casks are present in this tap (results may be incomplete — check the Casks directory for more):
 
+- adguardhome-sync — Synchronize AdGuard Home config to replicas
+  - Upstream/homepage: https://github.com/bakito/adguardhome-sync
+
 - kubexporter — Export Kubernetes resources for backup and migration.
   - Upstream/homepage: https://github.com/bakito/kubexporter
 
