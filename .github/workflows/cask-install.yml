@@ -1,0 +1,95 @@
+name: Test Homebrew Casks
+
+on:
+  pull_request:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  test-casks:
+    name: Cask test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+
+    env:
+      HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+      HOMEBREW_COLOR: "1"
+      HOMEBREW_DEVELOPER: "1"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Linux: install Homebrew (Linuxbrew). macOS runners already have brew.
+      - name: Install Homebrew (Linux only)
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates curl file git build-essential procps
+          NONINTERACTIVE=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          echo "/home/linuxbrew/.linuxbrew/bin" >> "$GITHUB_PATH"
+
+      - name: Ensure Homebrew is on PATH (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -x /opt/homebrew/bin/brew ]; then
+            echo "/opt/homebrew/bin" >> "$GITHUB_PATH"
+          elif [ -x /usr/local/bin/brew ]; then
+            echo "/usr/local/bin" >> "$GITHUB_PATH"
+          else
+            echo "brew not found on macOS runner"
+            exit 1
+          fi
+
+      - name: Brew info
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v brew
+          brew --version
+          brew doctor || true
+
+      - name: Tap this repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew tap bakito/tap
+          brew tap | sort
+
+      - name: Audit + install-test all casks
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          shopt -s nullglob
+          cask_files=(Casks/*.rb)
+          if [ ${#cask_files[@]} -eq 0 ]; then
+            echo "No casks found in Casks/*.rb"
+            exit 1
+          fi
+
+          echo "Found ${#cask_files[@]} cask(s):"
+          printf ' - %s\n' "${cask_files[@]}"
+
+          for cask_file in "${cask_files[@]}"; do
+            cask_name=$(basename "$cask_file" .rb)
+            echo "============================================================"
+            echo "Testing: $cask_name"
+
+            brew audit --cask --strict "$cask_name"
+            brew install --cask --verbose "$cask_name"
+
+            brew uninstall --cask --force "$cask_name" || brew uninstall --cask --force "$cask_file"
+          done
+
+          brew cleanup || true
