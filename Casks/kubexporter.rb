@@ -3,7 +3,7 @@ cask "kubexporter" do
   name "kubexporter"
   desc "Export Kubernetes resources for backup and migration."
   homepage "https://github.com/bakito/kubexporter"
-  version "0.8.1"
+  version "0.8.2"
 
   livecheck do
     skip "Auto-generated on release."
@@ -14,23 +14,22 @@ cask "kubexporter" do
   on_macos do
     on_intel do
       url "https://github.com/bakito/kubexporter/releases/download/v#{version}/kubexporter_#{version}_darwin_amd64.tar.gz"
-      sha256 "3cde63919376862a145f88eef5d051c417554e3deb98214ac464e447ec70b8b0"
+      sha256 "e52c9ebac079d365f8e45be2ae3e49480f1691a379c116b2e2203d59718fc1fc"
     end
     on_arm do
-      def caveats
-        <<~EOS
-          The darwin_arm64 architecture is not supported for the kubexporter
-          formula at this time. The darwin_amd64 binary may work in compatibility
-          mode, but it might not be fully supported.
-        EOS
-      end
+      url "https://github.com/bakito/kubexporter/releases/download/v#{version}/kubexporter_#{version}_darwin_arm64.tar.gz"
+      sha256 "558c7fe7309ae7113cf173d0e7ce5ca58d669e1f7acceeddc41646aba6fa60be"
     end
   end
 
   on_linux do
     on_intel do
       url "https://github.com/bakito/kubexporter/releases/download/v#{version}/kubexporter_#{version}_linux_amd64.tar.gz"
-      sha256 "a506614eada8e70e860a10d9b796e1748027cdd7926d1db003178b81b9133e7c"
+      sha256 "fa3d9f9bd4503350f1158d3efc5b75a6689638b581df4bc03839943ed2f1470b"
+    end
+    on_arm do
+      url "https://github.com/bakito/kubexporter/releases/download/v#{version}/kubexporter_#{version}_linux_arm64.tar.gz"
+      sha256 "257495aa95962ea3440ad44465d0e23f7204c56d43a57f44c54c2e2567a83d4c"
     end
   end
 
