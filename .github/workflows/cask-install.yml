@@ -1,79 +1,95 @@
+name: Test Homebrew Casks
 
-# GitHub Actions workflow to test installing each cask in this tap on macOS runners
-# Triggers: push, pull_request, and manual (workflow_dispatch)
 on:
-  push:
-    paths:
-      - '**/*.rb'
-      - '.github/workflows/**'
   pull_request:
+  push:
+    branches: [ main, master ]
   workflow_dispatch:
 
 jobs:
   test-casks:
-    name: Test Homebrew Casks
-    runs-on: macos-latest
-    timeout-minutes: 60
+    name: Cask test (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macos-latest ]
+
     env:
       HOMEBREW_NO_AUTO_UPDATE: "1"
+      HOMEBREW_NO_INSTALL_CLEANUP: "1"
+      HOMEBREW_COLOR: "1"
+      HOMEBREW_DEVELOPER: "1"
+
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Ensure Homebrew is ready
+      # Linux: install Homebrew (Linuxbrew). macOS runners already have brew.
+      - name: Install Homebrew (Linux only)
+        if: runner.os == 'Linux'
+        shell: bash
         run: |
-          # macOS runners already have Homebrew, but update the brew metadata quickly
-          brew update-reset || true
-          brew --version
+          set -euo pipefail
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates curl file git build-essential procps
+          NONINTERACTIVE=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          echo "/home/linuxbrew/.linuxbrew/bin" >> "$GITHUB_PATH"
 
-      - name: Discover and test casks
+      - name: Ensure Homebrew is on PATH (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
         run: |
-          set -eo pipefail
-
-          # Find cask ruby files in the repo and turn them into cask tokens (basename without .rb)
-          mapfile -t CASK_FILES < <(git ls-files | grep -E '\.rb$' || true)
-          CASKS=()
-          for f in "${CASK_FILES[@]}"; do
-            # skip formula directories if any (this tap contains only casks)
-            # adapt filters here if your cask files live in a particular directory (e.g. Casks/)
-            name=$(basename "$f" .rb)
-            CASKS+=("$name")
-          done
-
-          if [ ${#CASKS[@]} -eq 0 ]; then
-            echo "No casks found in repository; nothing to test."
-            exit 0
+          set -euo pipefail
+          if [ -x /opt/homebrew/bin/brew ]; then
+            echo "/opt/homebrew/bin" >> "$GITHUB_PATH"
+          elif [ -x /usr/local/bin/brew ]; then
+            echo "/usr/local/bin" >> "$GITHUB_PATH"
+          else
+            echo "brew not found on macOS runner"
+            exit 1
           fi
 
-          echo "Tapping repository so Homebrew can find the casks..."
-          brew tap bakito/homebrew-tap https://github.com/bakito/homebrew-tap || true
+      - name: Brew info
+        shell: bash
+        run: |
+          set -euo pipefail
+          command -v brew
+          brew --version
+          brew doctor || true
 
-          for c in "${CASKS[@]}"; do
-            echo "-----"
-            echo "Testing cask: $c"
-            FULL="bakito/homebrew-tap/$c"
+      - name: Tap this repository
+        shell: bash
+        run: |
+          set -euo pipefail
+          brew tap bakito/tap
+          brew tap | sort
 
-            # Install (use --no-quarantine to avoid Gatekeeper dialogs; --force to overwrite if present)
-            # Note: some casks require GUI interaction or acceptance; those may fail in CI.
-            if ! brew install --cask --no-quarantine --force "$FULL"; then
-              echo "ERROR: install failed for $FULL"
-              # show info to help debug
-              brew info --cask "$FULL" || true
-              exit 1
-            fi
+      - name: Audit + install-test all casks
+        shell: bash
+        run: |
+          set -euo pipefail
 
-            # Basic verification: show info and confirm brew lists it
-            brew info --cask "$FULL" || true
-            if brew list --cask | grep -xq "$c"; then
-              echo "$c appears in 'brew list --cask'"
-            else
-              echo "WARNING: $c not listed by 'brew list --cask' (may be installed under a different token)"
-            fi
+          shopt -s nullglob
+          cask_files=(Casks/*.rb)
+          if [ ${#cask_files[@]} -eq 0 ]; then
+            echo "No casks found in Casks/*.rb"
+            exit 1
+          fi
 
-            # Uninstall/cleanup (attempt zap to remove preferences)
-            brew uninstall --cask --zap --force "$FULL" || echo "Uninstall returned non-zero for $FULL, continuing"
+          echo "Found ${#cask_files[@]} cask(s):"
+          printf ' - %s\n' "${cask_files[@]}"
 
-            echo "Finished testing $c"
+          for cask_file in "${cask_files[@]}"; do
+            cask_name=$(basename "$cask_file" .rb)
+            echo "============================================================"
+            echo "Testing: $cask_name"
+
+            brew audit --cask --strict "$cask_name"
+            brew install --cask --verbose "$cask_name"
+
+            brew uninstall --cask --force "$cask_name" || brew uninstall --cask --force "$cask_file"
           done
 
-          echo "All casks processed."
+          brew cleanup || true
