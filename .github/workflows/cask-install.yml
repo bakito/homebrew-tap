@@ -63,7 +63,9 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          brew tap bakito/tap
+          # Tap the checked-out repository (current branch/commit) instead of the remote default branch.
+          # Use $GITHUB_WORKSPACE which is set by actions/checkout.
+          brew tap bakito/tap "$GITHUB_WORKSPACE"
           brew tap | sort
 
       - name: Audit + install-test all casks
