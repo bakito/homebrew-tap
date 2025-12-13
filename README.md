@@ -41,5 +41,9 @@ The following casks are present in this tap (results may be incomplete — check
 - kubexporter — Export Kubernetes resources for backup and migration.
   - Upstream/homepage: https://github.com/bakito/kubexporter
 
-For the full list of casks in this repository, view the Casks directory on GitHub:
-https://github.com/bakito/homebrew-tap/tree/main/0.8.2
+- kube-metrics — CLI visualizations of kubernetes pod and node metrics
+  - Upstream/homepage: https://github.com/bakito/kube-metrics
+
+- toolbox — A little toolbox to help fetching tools
+  - Upstream/homepage: https://github.com/bakito/toolbox
+
