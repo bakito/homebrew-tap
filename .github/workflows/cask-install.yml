@@ -22,11 +22,11 @@ jobs:
       HOMEBREW_DEVELOPER: "1"
 
     steps:
-      - name: Checkout
+      - name: 📥 Checkout
         uses: actions/checkout@v4
 
       # Linux: install Homebrew (Linuxbrew). macOS runners already have brew.
-      - name: Install Homebrew (Linux only)
+      - name: 🛠️ Install Homebrew (Linux only)
         if: runner.os == 'Linux'
         shell: bash
         run: |
@@ -37,7 +37,7 @@ jobs:
           NONINTERACTIVE=1 bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
           echo "/home/linuxbrew/.linuxbrew/bin" >> "$GITHUB_PATH"
 
-      - name: Ensure Homebrew is on PATH (macOS)
+      - name: 👍 Ensure Homebrew is on PATH (macOS)
         if: runner.os == 'macOS'
         shell: bash
         run: |
@@ -51,7 +51,7 @@ jobs:
             exit 1
           fi
 
-      - name: Brew info
+      - name: 🔎 Brew info
         shell: bash
         run: |
           set -euo pipefail
@@ -59,7 +59,7 @@ jobs:
           brew --version
           brew doctor || true
 
-      - name: Tap this repository
+      - name: 🚰 Tap this repository
         shell: bash
         run: |
           set -euo pipefail
@@ -68,7 +68,7 @@ jobs:
           brew tap bakito/tap "$GITHUB_WORKSPACE"
           brew tap | sort
 
-      - name: Audit + install-test all casks
+      - name: 🕵 Audit + 🚀 install-test all casks
         shell: bash
         run: |
           set -euo pipefail
