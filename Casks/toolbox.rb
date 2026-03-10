@@ -3,7 +3,7 @@ cask "toolbox" do
   name "toolbox"
   desc "A little toolbox to help fetching tools"
   homepage "https://github.com/bakito/toolbox"
-  version "0.4.24"
+  version "0.4.25"
 
   livecheck do
     skip "Auto-generated on release."
@@ -14,22 +14,22 @@ cask "toolbox" do
   on_macos do
     on_intel do
       url "https://github.com/bakito/toolbox/releases/download/v#{version}/toolbox_#{version}_darwin_amd64.tar.gz"
-      sha256 "d99a3c357491f2714944a447d466bdf6ee1eda94a912bdd42b74349a22f8738b"
+      sha256 "8d3476181484ade047085ec1d76b94b999e27d3c81396051a0c1b2664e984eef"
     end
     on_arm do
       url "https://github.com/bakito/toolbox/releases/download/v#{version}/toolbox_#{version}_darwin_arm64.tar.gz"
-      sha256 "e0ce48a5426b53c5541dac01e90899209e44dafcb16011474255c261431897c6"
+      sha256 "0186d63168bcbfccea99a315548922460b292b8c9d1ba57054005a3ced511063"
     end
   end
 
   on_linux do
     on_intel do
       url "https://github.com/bakito/toolbox/releases/download/v#{version}/toolbox_#{version}_linux_amd64.tar.gz"
-      sha256 "ee6528e2ecbbad32b6307d6e0adc40645116cfd27257db38f0a8555f228c4f38"
+      sha256 "efc84bcbc16dde995841c6f2597881caaff7bbd251d60221eccb4a5103b9a4b9"
     end
     on_arm do
       url "https://github.com/bakito/toolbox/releases/download/v#{version}/toolbox_#{version}_linux_arm64.tar.gz"
-      sha256 "f33e3e96573a9c63e307dc212a172627956dd5b7b3833afd6f85a900e12ede39"
+      sha256 "9aead26ec1bf302536d3dc8cca1c1744c7acf91797dfad2d02294f7f83921a33"
     end
   end
 
