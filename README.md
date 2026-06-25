@@ -8,7 +8,8 @@ This tap contains only Casks (no Formulae). Replace example names below with the
 Tap this repository:
 
 ```bash
-rew tap bakito/home
+brew tap bakito/home
+brew trust bakito/tap
 ```
 
 Install a cask from this tap:
